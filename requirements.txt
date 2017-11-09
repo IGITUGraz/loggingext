@@ -1,0 +1,1 @@
+git+https://github.com/IGITUGraz/scoop.git@4da1abb#egg=scoop-0.7.2.0-dev8

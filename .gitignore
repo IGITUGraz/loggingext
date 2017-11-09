@@ -1,0 +1,14 @@
+/ignored
+
+# setup related files
+/**/__pycache__
+/**/*.egg-info
+
+# style check directory
+/style-reports
+
+# unison temp files
+**/.unison*
+
+# clion meta-data director
+/.idea
