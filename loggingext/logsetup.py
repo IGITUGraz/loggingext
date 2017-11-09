@@ -17,23 +17,22 @@ import copy
 def create_shared_logger_data(logger_names, log_levels, log_to_consoles,
                               sim_name, log_directory):
     """
-    This function must be called to create a shared copy of information that will
-    be required to setup logging across processes. This must be run exactly once in
-    the root process. Note that it is not necessary for you to be running SCOOP in
-    order to use this function. This will work even in the single process case
-    where you don't run SCOOP in which case it will create global variables that
-    store the logger data.
+    This function must be called to create a shared copy of information that will be
+    required to setup logging across processes. This must be run exactly once in the
+    root process. Note that it is not necessary for you to be running SCOOP in order to
+    use this function. This will work even in the single process case where you don't
+    run SCOOP in which case it will create global variables that store the logger data.
 
     :param logger_names: This is a list of names of the loggers whose output you're
-        interested in.
+        interested in. The settings to a particular logger propagate to all sub-loggers
 
-    :param log_levels: This is the list of the same size of `logger_names` containing
-        the log levels.
+    :param log_levels: This is the list containing the log levels of the respective
+        loggers. It must be of the same legnth as `logger_names`
 
-    :param log_to_consoles: This is a list of the same size of `logger_names` containing
-        boolean values which indicate whether or not to redirect the output of the said
-        logger to stdout or not. Note that with SCOOP, and output to stdout on any
-        worker gets directed to the console of the main process.
+    :param log_to_consoles: This is a list of containing boolean values which indicate
+        whether or not to redirect the output of the said logger to stdout or not. Note
+        that with SCOOP, and output to stdout on any worker gets directed to the
+        console of the main process. This list must be of the same legnth as `logger_names`
 
     :param sim_name: This is a string that is used as a prefix when creating the log
         files. Short for simulation name.
