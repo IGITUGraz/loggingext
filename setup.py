@@ -37,6 +37,6 @@ setup(
                 " more convenient especially in conjunction with multiprocessing using"
                 " the SCOOP package",
     install_requires=requirements,
-    provides=['ltl'],
+    provides=['loggingext'],
     dependency_links=dependency_links,
 )
