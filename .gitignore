@@ -12,3 +12,6 @@
 
 # clion meta-data director
 /.idea
+
+# log files generated from testing
+tests/*_log_dir

@@ -26,7 +26,7 @@ def get_requirements(filename):
     return requirements, dependency_links
 
 
-requirements, dependency_links = get_requirements('requirements.txt')
+opt_requirements, opt_dependency_links = get_requirements('optional_requirements.txt')
 setup(
     name="loggingext",
     version=FULL_VERSION,
@@ -36,7 +36,10 @@ setup(
     description="This module provides helper functions to make the access to logging"
                 " more convenient especially in conjunction with multiprocessing using"
                 " the SCOOP package",
-    install_requires=requirements,
+    install_requires=[],
     provides=['loggingext'],
-    dependency_links=dependency_links,
+    extras_require={
+        'scoop': opt_requirements
+    },
+    dependency_links=opt_dependency_links,
 )

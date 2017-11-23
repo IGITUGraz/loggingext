@@ -8,8 +8,15 @@ environment.
 import os
 import logging
 import logging.config
-import scoop
-import scoop.shared
+
+try:
+    import scoop
+    import scoop.shared
+except ImportError as E:
+    with_scoop = False
+else:
+    with_scoop = True
+
 import socket
 import copy
 
@@ -29,10 +36,22 @@ def create_shared_logger_data(logger_names, log_levels, log_to_consoles,
     :param log_levels: This is the list containing the log levels of the respective
         loggers. It must be of the same legnth as `logger_names`
 
-    :param log_to_consoles: This is a list of containing boolean values which indicate
-        whether or not to redirect the output of the said logger to stdout or not. Note
-        that with SCOOP, and output to stdout on any worker gets directed to the
-        console of the main process. This list must be of the same legnth as `logger_names`
+    :param log_to_consoles: This is a list of values each of which is either boolean
+        True or False, or the string 'originonly'. This list must be of the same legnth
+        as `logger_names`. The logger correspondingly performs the following handling
+        on the values:
+
+        If `True`, then the logger always outputs to the console
+
+        If `False`, then the logger never outputs to the console.
+
+        If `'originonly'` then only the logger instance in the root process outputs to
+        stdout. In case of a single process environment, it has the same behaviour as
+        `True`
+
+        Note that the loggers as ALWAYS recorded to file irrespective of how they are
+        configured with regards to console printing. Also note that with SCOOP, output
+        to stdout on any worker gets directed to the console of the main process.
 
     :param sim_name: This is a string that is used as a prefix when creating the log
         files. Short for simulation name.
@@ -60,10 +79,10 @@ def create_shared_logger_data(logger_names, log_levels, log_to_consoles,
     assert all(isinstance(x, str) for x in logger_names), \
         "'logger_names' and must be a list of strings"
     assert os.path.isdir(log_directory), "The log_directory {} is not a valid log directory".format(log_directory)
+    assert all(x in [True, False, 'originonly'] for x in log_to_consoles), \
+        "log_to_consoles must be either boolean or the string 'originonly'"
 
-    log_to_consoles = [bool(x) for x in log_to_consoles]
-
-    if scoop.IS_RUNNING:
+    if with_scoop and scoop.IS_RUNNING:
         assert scoop.IS_ORIGIN, \
             "create_shared_logger_data must be called only on the origin worker"
         scoop.shared.setConst(logger_names=logger_names, log_levels=log_levels,
@@ -98,7 +117,7 @@ def configure_loggers(exactly_once=False):
     if exactly_once and configure_loggers._already_configured:
         return
 
-    if scoop.IS_RUNNING:
+    if with_scoop and scoop.IS_RUNNING:
         # Get shared data from scoop and perform the relevant configuration
         logger_names = scoop.shared.getConst('logger_names', timeout=1.0)
         log_levels = scoop.shared.getConst('log_levels', timeout=1.0)
@@ -115,10 +134,12 @@ def configure_loggers(exactly_once=False):
         sim_name = sim_name_global
         log_directory = log_directory_global
 
-    if scoop.IS_RUNNING and not scoop.IS_ORIGIN:
+    if with_scoop and scoop.IS_RUNNING and not scoop.IS_ORIGIN:
         file_name_prefix = '%s_%s_%s_' % (sim_name, socket.gethostname(), os.getpid())
+        log_to_consoles = [False if x == 'originonly' else x for x in log_to_consoles]
     else:
         file_name_prefix = '%s_' % (sim_name,)
+        log_to_consoles = [True if x == 'originonly' else x for x in log_to_consoles]
 
     config_dict_copy = copy.deepcopy(configure_loggers.basic_config_dict)
 
