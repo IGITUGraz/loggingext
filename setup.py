@@ -1,5 +1,4 @@
 from setuptools import setup
-import re
 
 from loggingext import __version__ as FULL_VERSION
 
@@ -10,23 +9,6 @@ Note that it does not perform any installation of the documentation. For this, f
 """
 
 
-def get_requirements(filename):
-    """
-    Helper function to read the list of requirements from a file
-    """
-    dependency_links = []
-    with open(filename) as requirements_file:
-        requirements = requirements_file.read().strip('\n').splitlines()
-    for i, req in enumerate(requirements):
-        if ':' in req:
-            match_obj = re.match(r"git\+(?:https|ssh|http):.*#egg=(\w+)-(.*)", req)
-            assert match_obj, "Cannot make sence of url {}".format(req)
-            requirements[i] = "{req}=={ver}".format(req=match_obj.group(1), ver=match_obj.group(2))
-            dependency_links.append(req)
-    return requirements, dependency_links
-
-
-opt_requirements, opt_dependency_links = get_requirements('optional_requirements.txt')
 setup(
     name="loggingext",
     version=FULL_VERSION,
@@ -38,8 +20,4 @@ setup(
                 " the SCOOP package",
     install_requires=[],
     provides=['loggingext'],
-    extras_require={
-        'scoop': opt_requirements
-    },
-    dependency_links=opt_dependency_links,
 )

@@ -8,8 +8,7 @@ try:
     from scoop.futures import map
     import scoop
 except ImportError as E:
-    raise RuntimeError("The scoop log test requires the scoop feature to be installed via \n"
-                       "pip install .[scoop] --process-dependency-links")
+    raise RuntimeError("The scoop log test requires the scoop package to be installed")
 
 if not scoop.IS_RUNNING:
     raise RuntimeError("This test is to be run using scoop i.e\n"
@@ -28,7 +27,7 @@ def main():
     create_shared_logger_data(logger_names=['scooploggertest'], log_levels=['INFO'], log_to_consoles=['originonly'],
                               sim_name='testlogger', log_directory=log_directory)
     configure_loggers()
-    res = list(map(map_function, range(100)))
+    list(map(map_function, range(100)))
 
 
 if __name__ == '__main__':
